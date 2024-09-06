@@ -70,12 +70,31 @@ export default function useAuth(){
         }
     }
 
+    const register = async(credential) => {
+        try {
+            await axios.get('/sanctum/csrf-cookie');
+            await axios.post('/register', {
+                name: credential.name,
+                email: credential.email,
+                password: credential.password,
+                password_confirmation: credential.password_confirmation,
+            })
+
+            await attempt()
+
+            await router.push('/');
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return {
         login, 
         getUser,
         getAuthenticated,
         attempt,
         errors,
-        logout
+        logout,
+        register
     }
 }
