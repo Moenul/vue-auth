@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { reactive, computed, ref } from 'vue';
+import router from '../router';
 
 const state = reactive({
     authenticated: false,
@@ -45,6 +46,8 @@ export default function useAuth(){
                 password: credential.password
             });
             await attempt()
+
+            await router.push('/');
         } catch (e) {
             if (e.response.status === 422) {
                 errors.value = e.response.data.errors
@@ -54,11 +57,25 @@ export default function useAuth(){
         }
     }
 
+    const logout = async() => {
+        try {
+            await axios.post('/logout');
+
+            setAuthenticated(state.authenticated = false);
+            setUser(state.user = {});
+
+            await router.push('/login');
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     return {
         login, 
         getUser,
         getAuthenticated,
         attempt,
-        errors
+        errors,
+        logout
     }
 }
